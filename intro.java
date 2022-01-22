@@ -159,6 +159,36 @@ class intro{
         return hasPath_helper(src,des,graph,vis);
     }
 
+    // get connected components
+    public static void dfs(int src,ArrayList<Edge>[] graph,ArrayList<Integer> comp,boolean[] vis){  
+        vis[src]=true;
+        comp.add(src);
+
+        for(Edge nbr:graph[src]){
+            if(!vis[nbr.v]){
+                dfs(nbr.v,graph,comp,vis);
+            }
+        }
+    }   
+    public static ArrayList<ArrayList<Integer>> getConnectedComponents(ArrayList<Edge>[] graph, int V){
+        boolean[] vis=new boolean[V];
+
+        ArrayList<ArrayList<Integer>> components=new ArrayList<>();
+        int total_comp=0;
+        for(int i=0; i<V; i++){
+            if(!vis[i]){
+                ArrayList<Integer> comp=new ArrayList<>();
+                dfs(i,graph,comp,vis);
+                total_comp++;
+                components.add(comp);
+            }
+        }
+
+        int number_of_connected_components=components.size();
+
+        return components;
+    }
+
     public static void construct(){
         int V=11;
 
@@ -180,6 +210,12 @@ class intro{
         addEdge(5,6,2,graph);
         addEdge(6,7,3,graph);
         addEdge(5,7,3,graph);
+
+        removeEdge(4,9,graph);
+        removeEdge(4,10,graph);
+        removeEdge(4,5,graph);
+        removeEdge(4,2,graph);
+
     }
 
     public static void main(String[] args){
