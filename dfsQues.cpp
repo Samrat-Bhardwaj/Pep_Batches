@@ -167,6 +167,42 @@ int countSubIslands(vector<vector<int>>& grid1, vector<vector<int>>& grid2) {
     return ans;
 }
 
+// https://www.hackerrank.com/challenges/journey-to-the-moon/problem
+int dfs_size(int src,vector<vector<int>>& graph,vector<bool>& vis){
+    vis[src]=true;
+
+    int size=0;
+    for(int nbr:graph[src]){
+        if(!vis[nbr]){
+            size+=dfs_size(nbr,graph,vis);
+        }
+    }
+
+    return size+1;
+}
+
+int journeyToMoon(int n, vector<vector<int>> edges) {
+    vector<vector<int>> graph(n);
+
+    for(auto &e:edges){
+        graph[e[0]].push_back(e[1]);
+        graph[e[1]].push_back(e[0]);
+    }
+
+    vector<bool> vis(n,false);
+    long long total_size=0;
+    long long ans=0;
+    for(int i=0; i<n; i++){
+        if(!vis[i]){
+            int size=dfs_size(i,graph,vis);
+            ans=ans+total_size*size;
+            total_size+=size;
+        }
+    }
+    return ans;
+}
+
+
 int main(){
     return 0;
 }
