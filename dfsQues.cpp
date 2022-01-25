@@ -1,5 +1,5 @@
 #include<vector>
-
+#include<queue>
 using namespace std;
 
 void dfs(int i, int j,vector<vector<char>>& grid){
@@ -131,6 +131,41 @@ void solve(vector<vector<char>>& board) {
     }
 }
 
+// leet 1905 ==================================================== 
+
+bool dfs4(vector<vector<int>>& grid1, vector<vector<int>>& grid2, int i, int j, int n, int m){
+    bool ans= (grid1[i][j]==grid2[i][j]);
+
+    vector<vector<int>> dirs={{0,1},{1,0},{0,-1},{-1,0}};
+    grid2[i][j]=0;
+    for(auto &dir:dirs){
+        int r=i+dir[0];
+        int c=j+dir[1];
+
+        if(r>=0 && c>=0 && r<n && c<m && grid2[r][c]==1){
+            ans = dfs4(grid1,grid2,r,c,n,m) && ans;
+        }
+    }
+
+    return ans;
+}
+
+int countSubIslands(vector<vector<int>>& grid1, vector<vector<int>>& grid2) {
+    int ans=0;
+    int n=grid1.size();
+    int m=grid1[0].size();
+
+    for(int i=0; i<n; i++){
+        for(int j=0; j<m; j++){
+            if(grid2[i][j]==1){
+                bool isSub=dfs4(grid1,grid2,i,j,n,m);
+                if(isSub) ans++;
+            }
+        }
+    }        
+
+    return ans;
+}
 
 int main(){
     return 0;
