@@ -50,7 +50,8 @@ class directed{
         graph[u].remove(idx);
     }
 
-    // topological ordering 
+    // topological ordering =======================
+
     public void dfs_topo(int src,ArrayList<Edge>[] graph,boolean[] vis,ArrayList<Integer> topo){
         vis[src]=true;
 
@@ -77,6 +78,89 @@ class directed{
         for(int i=topo.size()-1; i>=0; i--){
             System.out.println(topo.get(i));
         }
+    }
+
+    // kahn's algo ===============================================================
+
+    ArrayList<Integer> topological_order_bfs(ArrayList<Edge>[] graph){
+        int V=graph.length;
+
+        int[] indegree=new int[V];
+
+        for(int i=0; i<V; i++){
+            for(Edge e:graph[i]){
+                indegree[e.v]++;
+            }
+        }
+
+        LinkedList<Integer> que=new LinkedList<>();
+        ArrayList<Integer> topo_order=new ArrayList<>();
+
+        for(int i=0; i<V; i++){
+            if(indegree[i]==0){
+                que.addLast(i);
+            }
+        }
+
+        while(que.size()>0){
+            int ele=que.removeFirst();
+            topo_order.add(ele);
+
+            for(Edge e:graph[ele]){
+                indegree[e.v]--;
+                if(indegree[e.v]==0){
+                    que.addLast(e.v);
+                }
+            }
+        }
+
+        if(topo_order.size()!=V){
+            System.out.println("NO SOLUTION!!!!!!!");
+            return new ArrayList<>();
+        }
+
+        return topo_order;
+    }
+
+    // level wise topo ordering 
+    ArrayList<ArrayList<Integer>> topological_order_bfs(ArrayList<Edge>[] graph){
+        int V=graph.length;
+
+        int[] indegree=new int[V];
+
+        for(int i=0; i<V; i++){
+            for(Edge e:graph[i]){
+                indegree[e.v]++;
+            }
+        }
+
+        LinkedList<Integer> que=new LinkedList<>();
+        ArrayList<ArrayList<Integer>> topo_order=new ArrayList<>();
+
+        for(int i=0; i<V; i++){
+            if(indegree[i]==0){
+                que.addLast(i);
+            }
+        }
+
+        while(que.size()>0){
+           int size=que.size();
+           ArrayList<Integer> smallAns=new ArrayList<>();
+           while(size-->0){
+               int ele=que.removeFirst();
+                smallAns.add(ele);
+
+                for(Edge e:graph[ele]){
+                    indegree[e.v]--;
+                    if(indegree[e.v]==0){
+                        que.addLast(e.v);
+                    }
+                }
+           }
+           topo_order.add(smallAns);
+        }
+
+        return topo_order;
     }
 
     public static void construct(){
