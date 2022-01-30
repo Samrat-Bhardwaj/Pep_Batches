@@ -163,6 +163,49 @@ class directed{
         return topo_order;
     }
 
+
+// kruskal Algorithm ======================================================================= 
+    int[] par;
+    public int findPar(int u){
+        if(par[u]==u) return u;
+
+        return par[u]=findPar(par[u]);
+    }
+
+    public ArrayList<Edge>[] kruskal(int[][] edges, int N){
+        Arrays.sort(edges,(int[] a, int [] b)->{
+            return a[2] - b[2]; // sorting on the bases of weight
+        });
+
+        ArrayList<Edge>[] mst=new ArrayList[N];
+        for(int i=0; i<N; i++){
+            mst[i]=new ArrayList<>();
+        }
+
+        par=new int[N];
+        for(int i=0; i<N; i++){
+            par[i]=i;
+        }
+
+        for(int i=0; i<edges.length; i++){
+            int[] edge=edges[i];
+
+            int u=edge[0];
+            int v=edge[1];
+            int w=edge[2];
+
+            int p1=findPar(u);
+            int p2=findPar(v);
+
+            if(p1!=p2){
+                addEdge(u,v,w,mst);
+                par[p2]=p1;
+            }
+        }
+
+        return mst;
+    }
+
     public static void construct(){
         int V=11;
 

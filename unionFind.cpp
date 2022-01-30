@@ -292,6 +292,226 @@ string smallestStringWithSwaps(string s, vector<vector<int>>& pairs) {
     return ans;
 }
 
+// leet 721 ====================================
+vector<int> par;
+int findPar(int u){
+    if(par[u]==u){
+        return u;
+    }
+
+    return par[u]=findPar(par[u]);
+}
+
+vector<vector<string>> accountsMerge(vector<vector<string>>& accounts) {
+    unordered_map<string,int> etuid; // email to unique id
+    unordered_map<string,string> etn; // email to name
+    int uid=0;
+
+    par.resize(1001);
+    for(int i=0; i<=1000; i++){
+        par[i]=i;
+    }
+
+    for(auto &account:accounts){
+        string name=account[0];
+        for(int i=1; i<account.size(); i++){
+            string email=account[i];
+
+            if(etuid.find(email)==etuid.end()){
+                etuid[email]=uid;
+                uid++;
+            }
+
+            etn[email]=name;
+
+            // parent of first email id in this account
+            int p1=findPar(etuid[account[1]]);
+            // parent of current email
+            int p2=findPar(etuid[email]);
+
+            if(p1!=p2){
+                par[p2]=p1;
+            }
+        }
+    }
+
+    vector<vector<string>> ans;
+    unordered_map<int,vector<string>> res; // par vs emails
+
+    for(auto &kv:etuid){
+        int id=kv.second;
+
+        int p=findPar(id);
+        if(res.find(p)==res.end()){
+            res[p]={kv.first};
+        } else {
+            res[p].push_back(kv.first);
+        }
+    }
+
+    for(auto &kv:res){
+        vector<string> &emails=kv.second;
+
+        sort(emails.begin(),emails.end());
+        // inserting name in the front
+        emails.insert(emails.begin(),etn[emails[0]]);
+
+        ans.push_back(emails);
+    }
+
+    return;
+}
+
+
+// leet 839 ======================================================== 
+unordered_map<string,string> par;
+
+string findPar(string& u){
+    if(par[u]==u) return u;
+
+    return par[u]=findPar(par[u]);
+}
+
+bool isSimilar(string& a, string& b){
+    int diff=0;
+    for(int i=0; i<a.size(); i++){
+        if(a[i]!=b[i]) diff++;
+        if(diff>2) return false;
+    }
+
+    if(diff==0) return true;
+
+    return diff==2;
+}
+
+int numSimilarGroups(vector<string>& strs) {
+    for(string s:strs){
+        par[s]=s;
+    }
+
+    int comps=strs.size();
+
+
+    for(int i=0; i<strs.size(); i++){
+        string p1=findPar(strs[i]);
+        for(int j=i+1; j<strs.size(); j++){
+            if(isSimilar(strs[i],strs[j])){
+                string p2=findPar(strs[j]);
+
+                if(p1!=p2){
+                    par[p2]=p1;
+                    comps--;
+                }
+            }
+        }
+    }
+
+    
+
+    return comps;
+}
+
+
+// leet 1168 ====================================================
+vector<int> par;
+int fp(int u){
+    return par[u] == u ? u : par[u]=fp(par[u]);
+}
+
+int minCostToSupplyWater(int n, vector<int>& wells, vector<vector<int>>& pipes) {
+    par.resize(n+1);
+
+    for(int i=0; i<=n; i++) par[i]=i;
+
+    for(int i=0; i<wells.size(); i++){
+        vector<int> pipe={0,i+1,wells[i]};
+        pipes.push_back(pipe);
+    }
+
+    sort(pipes.begin(),pipes.end(),[](vector<int>& a, vector<int>& b){
+        return a[2] < b[2];
+    });
+
+
+    int final_cost=0;
+    for(int i=0; i<pipes.size(); i++){
+        int u=pipes[i][0];
+        int v=pipes[i][1];
+        int c=pipes[i][2];
+
+        int p1=fp(u);
+        int p2=fp(v);
+
+        if(p1!=p2){
+            par[p2]=p1;
+            final_cost+=c;
+        }
+    }
+
+    return final_cost;
+}
+
+
+// leet 1584 ============================================================ 
+vector<int> par;
+vector<int> size;
+int fp(int u){
+    return par[u] == u ? u : par[u]=fp(par[u]);
+}
+
+void merge(int p1, int p2){
+    if(size[p2]<=size[p1]){
+        par[p2]=p1;
+        size[p1]+=size[p2];
+    } else {
+        par[p1]=p2;
+        size[p2]+=size[p1];
+    }
+}
+
+int getDis(vector<int>& c1, vector<int>& c2){
+    return abs(c1[0]-c2[0]) + abs(c1[1]-c2[1]);
+}
+int minCostConnectPoints(vector<vector<int>>& points) {
+    vector<vector<int>> edges;
+
+    int n=points.size();
+
+    par.resize(n);
+    size.resize(n,1);
+
+    for(int i=0; i<n; i++) par[i]=i;
+
+    for(int i=0; i<n; i++){
+        for(int j=i+1; j<n; j++){
+            int dis=getDis(points[i],points[j]);
+
+            edges.push_back({i,j,dis});
+        }
+    }        
+
+    sort(edges.begin(),edges.end(),[](vector<int>& a, vector<int>& b){
+        return a[2] < b[2];
+    });
+
+    int cost=0;
+    for(int i=0; i<edges.size(); i++){
+        int u=edges[i][0];
+        int v=edges[i][1];
+        int w=edges[i][2];
+
+        int p1=fp(u);
+        int p2=fp(v);
+
+        if(p1!=p2){
+            par[p2]=p1;
+            cost+=w;
+        }
+    }
+
+    return cost;
+}
+
 int main(){
     return 0;
 }
