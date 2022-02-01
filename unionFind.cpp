@@ -512,6 +512,180 @@ int minCostConnectPoints(vector<vector<int>>& points) {
     return cost;
 }
 
+// num of islands 2======================================
+
+vector<int> par;
+int findPar(int u){
+    if(par[u]==u) return u;
+
+    return par[u]=findPar(par[u]);
+}
+
+vector<int> numIslands2(int n, int m, vector<vector<int>>& positions) {
+    vector<vector<int>> grid(n,vector<int>(m,0));
+
+    par.resize(n*m);
+    for(int i=0; i<n*m; i++){
+        par[i]=i;
+    }
+
+    int count=0;
+    vector<int> ans;
+
+    vector<vector<int>> dirs={{0,1},{1,0},{0,-1},{-1,0}};
+
+    for(int i=0; i<positions.size(); i++){
+        int px=positions[i][0];
+        int py=positions[i][1];
+
+        if(grid[px][py]==1){
+            ans.push_back(count);
+            continue;
+        }
+
+        grid[px][py]=1;
+        count++;
+        int p1=findPar(px*m+py);
+        for(auto &dir:dirs){
+            int i=px+dir[0];
+            int j=py+dir[1];
+
+            if(i>=0 && j>=0 && i<n && j<m && grid[i][j]==1){
+                int p2=findPar(i*m+j);
+
+                if(p1!=p2){
+                    par[p2]=p1;
+                    count--;
+                }
+            }
+        }
+        ans.push_back(count);
+    }
+
+    return ans;
+}
+
+// num of islands 2 ===========================================================
+vector<int> par;
+int findPar(int u){
+    return par[u]==u ? u : par[u]=findPar(par[u]);
+}
+
+vector<int> numIslands2(int n, int m, vector<vector<int>>& positions) {
+    par.resize(n*m,-1); // -1 -> water
+
+    int count=0;
+    vector<int> ans;
+
+    vector<vector<int>> dirs={{0,1},{1,0},{0,-1},{-1,0}};
+
+    for(vector<int>& pos:positions){
+        int px=pos[0];
+        int py=pos[1];
+
+        if(par[px*m+py]!=-1){
+            ans.push_back(count);
+            continue;
+        }
+
+        par[px*m+py]=px*m+py;
+        count++;
+        int p1=findPar(px*m+py);
+
+        for(auto &dir:dirs){
+            int i=px+dir[0];
+            int j=py+dir[1];
+
+            if(i>=0 && j>=0 && i<n && j<m && par[i*m+j]!=-1){
+                int p2=findPar(i*m+j);
+
+                if(p1!=p2){
+                    par[p2]=p1;
+                    count--;
+                }
+            }
+        }
+        ans.push_back(count);
+    }
+    return ans;    
+}
+
+// leet 924 =====================================================================
+vector<int> par;
+vector<int> size;
+
+int findPar(int u){
+    if(par[u]==u) return u;
+
+    return par[u]=findPar(par[u]);
+}
+
+void merge(int p1, int p2){
+    if(size[p2]<=size[p1]){
+        par[p2]=p1;
+        size[p1]+=size[p2];
+    } else {
+        par[p1]=p2;
+        size[p2]+=size[p1];
+    }
+}
+
+int minMalwareSpread(vector<vector<int>>& graph, vector<int>& initial) {
+    int n=graph.size();
+
+    par.resize(n);
+    size.resize(n);
+
+    for(int i=0; i<n; i++){
+        par[i]=i;
+        size[i]=1;
+    }
+
+    for(int i=0; i<n; i++){
+        for(int j=0; j<n; j++){
+            if(graph[i][j]==0) continue;
+            if(i==j) continue;
+
+            int p1=findPar(i);
+            int p2=findPar(j);
+
+            if(p1!=p2){
+                merge(p1,p2);
+            }
+        }
+    }
+
+    sort(initial.begin(),initial.end());
+
+    vector<int> fre(n,0);
+    for(int i=0; i<initial.size(); i++){
+        int e=initial[i];
+
+        int p=findPar(e);
+        fre[p]++;
+    }
+
+    int m=0;
+    int ans=-1;
+
+    for(int i=0; i<initial.size(); i++){
+        int e=initial[i];
+
+        int p=findPar(e);
+
+        if(fre[p]==1){
+            if(size[p]>m){
+                m=size[p];
+                ans=e;
+            }
+        }
+    }
+
+    if(ans==-1) return initial[0];
+
+    return ans;
+}
+
 int main(){
     return 0;
 }
