@@ -48,3 +48,41 @@ int networkDelayTime(vector<vector<int>>& times, int n, int k) {
 
     return dijkstra(graph,k-1,n);
 }
+
+
+// leet 787 
+
+int findCheapestPrice(int n, vector<vector<int>>&flights, int src, int dst, int k) {
+        vector<int> dis(n,(int)(1e8));
+
+        dis[src]=0;
+
+        bool negativeCycle=false;
+
+        for(int i=1; i<=k+1; i++){
+            vector<int> ndis=dis;
+
+            bool isUpdate=false;
+
+            for(auto& edge:flights){
+                int u=edge[0];
+                int v=edge[1];
+                int w=edge[2];
+
+                if(dis[u] + w < ndis[v]){
+                    ndis[v]=dis[u]+w;
+                    isUpdate=true;
+                }
+            }
+
+            if(isUpdate==false) break;
+
+            if(i==n && isUpdate){
+                negativeCycle=true;
+            }
+
+            dis=ndis;
+        }
+
+        return dis[dst] == (int)(1e8) ? -1 : dis[dst];
+    }
