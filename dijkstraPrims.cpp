@@ -100,6 +100,59 @@ void dijkstra2(vector<vector<Edge>> graph, int src){
 }
 
 
+// leet 505 (The Maze 2)=================================================================== 
+
+int shortestDistance(vector<vector<int>>& maze, vector<int>& start, vector<int>& destination) {
+    vector<vector<int>> dirs={{0,1},{1,0},{-1,0},{0,-1}};
+
+    int n=maze.size();
+    int m=maze[0].size();
+
+    vector<vector<int>> vis(n,vector<int>(m,(int)(1e8)));
+
+    //{dis,vtx}
+    priority_queue<pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>> q;
+
+    q.push({0,start[0]*m+start[1]});
+    vis[start[0]][start[1]]=0;
+
+    while(q.size()){
+        auto idx=q.top(); q.pop();
+
+        int dis=idx.first;
+
+        int i=idx.second/m;
+        int j=idx.second%m;
+
+        if(i==destination[0] && j==destination[1]) return dis;
+
+        for(auto &dir:dirs){
+            int x=i+dir[0];
+            int y=j+dir[1];
+
+            int curr=1;
+            while(x>=0 && y>=0 && x<n && y<m && maze[x][y]!=1){
+                x+=dir[0];
+                y+=dir[1];
+                curr++;
+            } 
+            
+            // moving back one step
+            x-=dir[0];
+            y-=dir[1];
+            curr--;
+
+            if(vis[x][y]<=dis+curr) continue;
+
+            vis[x][y]=dis+curr;
+
+            q.push({dis+curr,x*m+y});
+        }        
+    }
+    return -1;
+}
+
+
 int main(){
     return 0;
 }

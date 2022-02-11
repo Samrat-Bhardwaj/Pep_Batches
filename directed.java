@@ -206,6 +206,81 @@ class directed{
         return mst;
     }
 
+
+    // kosaraju algortihm ===========================================================
+
+    public static void dfs_01(int src,ArrayList<Edge>[] graph,boolean[] vis,ArrayList<Integer> st){
+        vis[src]=true;
+
+        for(Edge nbr:graph[src]){
+            if(!vis[nbr.v]){
+                dfs_01(nbr.v,graph,vis,st);
+            }
+        }
+
+        st.add(src);
+    }
+
+    public static void dfs_02(int src, ArrayList<Edge>[] graph,ArrayList<Integer> comp,boolean[] vis){
+        vis[src]=true;
+        comp.add(src);
+
+        for(Edge nbr:graph[src]){
+            if(!vis[nbr.v]){
+                dfs_02(nbr.v,graph,comp,vis);
+            }
+        }
+    }
+
+    public static ArrayList<ArrayList<Integer>> kosaraju(ArrayList<Edge>[] graph){
+        int V=graph.length;
+
+        boolean[] vis=new boolean[];
+
+        ArrayList<Integer> st=new ArrayList<>();
+
+        for(int i=0; i<V; i++){
+            if(!vis[i]){
+                dfs_01(i,graph,vis,st);
+            }
+        }
+
+        ArrayList<Edge>[] rGraph=new ArrayList[V];
+
+        for(int i=0; i<V; i++){
+            rGraph[i]=new ArrayList<>();
+        }
+
+        for(int u=0; u<V; u++){
+            ArrayList<Edge> al=graph[u];
+
+            for(int j=0; j<al.size(); j++){
+                int v=al.get(j).v;
+                int w=al.get(j).w;
+
+                rGraph[v].add(new Edge(i,w));
+            }
+        }
+
+        int count=0;
+
+        ArrayList<ArrayList<Integer>> scc=new ArrayList<>();
+        vis=new boolean[V];
+        for(int i=st.size()-1; i>=0; i--){
+            if(!vis[st.get(i)]){
+                ArrayList<Integer> comp=new ArrayList<>();
+                dfs_02(i,rGraph,comp,vis);
+                count++;
+
+                scc.add(comp);
+            }
+        }
+
+        // number of scc
+        System.out.println(count);
+        return scc;
+    }
+
     public static void construct(){
         int V=11;
 
